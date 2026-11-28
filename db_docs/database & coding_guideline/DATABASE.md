@@ -12,7 +12,8 @@ A contest has rounds; a gym set is a `contest_rounds` row with `type='gym'` and 
 
 | Domain | Table | Purpose and important fields |
 |---|---|---|
-| Identity | `users` | Unique case-insensitive handle/email, password hash, profile, country/region, role, status, rating. |
+| Identity | `users` | Unique case-insensitive handle/email, nullable password hash for OAuth-only users, profile, country/region, role, status, rating. |
+| Identity | `oauth_accounts` | Google/Facebook identities linked to users; unique provider identity and one account per provider per user. |
 | Identity | `user_settings` | One-to-one theme, default language, source/profile privacy, notification preferences. |
 | Identity | `auth_sessions` | Hashed session token, expiry, revocation, user agent, IP. |
 | Identity | `password_reset_tokens` | Hashed reset token and use/expiry times. |
@@ -44,6 +45,14 @@ A contest has rounds; a gym set is a `contest_rounds` row with `type='gym'` and 
 | Infrastructure | `schema_migrations` | Runner-managed filename, SHA-256 checksum and application time. |
 
 `v_public_sample_tests` returns public, active problem samples that are not hidden and not attached to an upcoming contest. `v_public_editorials` returns published editorials for public, active problems only after all linked contest rounds end. Public API queries must use these views or equivalent checked service queries. Grant the public API database account read access only to safe views/projections where practical; DB table access alone cannot enforce user identity.
+
+## Profile identity extension (Phase 1)
+
+The backend repo now includes the previously separate `0001_initial_schema.sql` as its baseline migration and `0002_add_oauth_accounts.sql` as the additive identity change. The live Aiven schema could not be inspected from this workspace; compare it with the baseline before applying these files there. Existing `users.user_id`, `handle`, and `country_code` remain the database keys; API responses can expose them as `id`, `username`, and `country`. `password_hash` is nullable only so an OAuth-only user can exist. Service logic must require either a password hash or at least one linked provider and must link by a provider-verified email address.
+
+`oauth_accounts.provider_user_id` uses binary collation for exact provider ID matching. `(provider, provider_user_id)` is unique globally; `(user_id, provider)` limits each user to one account per provider while allowing both Google and Facebook. Deleting a user cascades to its provider links; the existing submission and rating history foreign keys already restrict deletion of users with history.
+
+No new stats table is needed. `users.rating` and `max_rating` hold current and best rating. Submission count comes from `submissions` by `user_id`. Solved count can be derived with `COUNT(DISTINCT problem_id)` over completed accepted submissions, or read from `user_problem_stats` once that cache is maintained by the judging service. The Phase 1 profile seed creates ten fictional public profiles with ordinary handles, but it does not fabricate submission or solve history. Its ratings are explicitly illustrative.
 
 ## Relationships and invariants
 

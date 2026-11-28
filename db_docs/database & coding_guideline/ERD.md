@@ -25,6 +25,12 @@ erDiagram
     BIGINT user_id PK,FK
     INT default_language_id FK
   }
+  oauth_accounts {
+    BIGINT oauth_account_id PK
+    BIGINT user_id FK
+    ENUM provider
+    VARCHAR provider_user_id UK
+  }
   auth_sessions {
     BIGINT session_id PK
     BIGINT user_id FK
@@ -78,6 +84,7 @@ erDiagram
     BIGINT author_id FK
   }
   users ||--o| user_settings : user_id
+  users ||--o{ oauth_accounts : user_id
   programming_languages ||--o{ user_settings : default_language_id
   users ||--o{ auth_sessions : user_id
   users ||--o{ password_reset_tokens : user_id
