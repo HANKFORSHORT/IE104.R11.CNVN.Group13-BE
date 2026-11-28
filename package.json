@@ -4,7 +4,7 @@
   "description": "",
   "main": "db.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test scripts/test-auth.js scripts/test-profile.js scripts/test-account-data.js scripts/test-reset.js",
     "start": "node server.js",
     "db:migrate": "node scripts/migrate.js",
     "db:seed:profiles": "node scripts/seed-profiles.js"
@@ -22,9 +22,11 @@
   },
   "homepage": "https://github.com/HANKFORSHORT/IE104.Group13.BE#readme",
   "dependencies": {
+    "bcryptjs": "3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.10",
     "express": "^5.3.0",
-    "mysql2": "^3.24.6"
+    "mysql2": "^3.24.6",
+    "nodemailer": "10.6.1"
   }
 }

@@ -5,12 +5,25 @@ require('dotenv').config();
 const db = require('./db');
 const problemsRouter = require('./routes/problems');
 const profilesRouter = require('./routes/profiles');
+const config = require('./src/config');
+const authRouter = require('./src/routes/auth');
+const profileRouter = require('./src/routes/profiles');
+const requireAllowedOrigin = require('./src/middlewares/origin');
+const errorHandler = require('./src/middlewares/error-handler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin(origin, callback) {
+    callback(null, !origin || config.frontendOrigins.has(origin));
+  },
+  credentials: true
+}));
+app.use(express.json({ limit: '16kb' }));
+app.use('/api/v1', requireAllowedOrigin);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1', profileRouter);
 
 app.get('/api/health', async (req, res) => {
   try {
@@ -31,7 +44,11 @@ app.get('/api/health', async (req, res) => {
 
 app.use('/api/problems', problemsRouter);
 app.use('/api/profiles', profilesRouter);
+app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server đang chạy tại http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server đang chạy tại http://localhost:${PORT}`);
+  });
+}
+module.exports = app;
