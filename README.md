@@ -22,3 +22,9 @@ IE104.Group13.BE/
 ├── server.js               # Entry point của Express server & API kiểm tra kết nối
 ├── package.json            # Khai báo dependencies và scripts
 └── README.md               # Tài liệu hướng dẫn dự án
+
+```
+
+## Public profile API
+
+`GET /api/profiles/:handle` returns an active user's public profile, rating, solved and submission counts, UTC daily submission activity for the last year, and earned achievements. Profiles with `user_settings.is_profile_public = 0` return 404. The response excludes email, password hashes, source code and other private account fields. This endpoint does not authenticate the browser; private profile and settings APIs require server-side authentication.
