@@ -5,6 +5,7 @@ require('dotenv').config();
 const db = require('./db');
 const problemsRouter = require('./routes/problems');
 const problemDetailsRouter = require('./routes/problem-details');
+const submissionsRouter = require('./routes/submissions');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,6 +32,7 @@ app.get('/api/health', async (req, res) => {
 
 app.use('/api/problems', problemsRouter);
 app.use('/api/problems', problemDetailsRouter);
+app.use('/api/submissions', submissionsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
