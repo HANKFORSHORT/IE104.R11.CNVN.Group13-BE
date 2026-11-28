@@ -52,7 +52,7 @@ The backend repo now includes the previously separate `0001_initial_schema.sql` 
 
 `oauth_accounts.provider_user_id` uses binary collation for exact provider ID matching. `(provider, provider_user_id)` is unique globally; `(user_id, provider)` limits each user to one account per provider while allowing both Google and Facebook. Deleting a user cascades to its provider links; the existing submission and rating history foreign keys already restrict deletion of users with history.
 
-No new stats table is needed. `users.rating` and `max_rating` hold current and best rating. Submission count comes from `submissions` by `user_id`. Solved count can be derived with `COUNT(DISTINCT problem_id)` over completed accepted submissions, or read from `user_problem_stats` once that cache is maintained by the judging service. The Phase 1 demo seed creates ten fictional public profiles, but it does not fabricate submission or solve history. Its ratings are explicitly illustrative.
+No new stats table is needed. `users.rating` and `max_rating` hold current and best rating. Submission count comes from `submissions` by `user_id`. Solved count can be derived with `COUNT(DISTINCT problem_id)` over completed accepted submissions, or read from `user_problem_stats` once that cache is maintained by the judging service. The Phase 1 profile seed creates ten fictional public profiles with ordinary handles, but it does not fabricate submission or solve history. Its ratings are explicitly illustrative.
 
 ## Relationships and invariants
 
